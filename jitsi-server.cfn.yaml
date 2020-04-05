@@ -1,0 +1,349 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Set up a personal Jitsi meet server as an EC2 instance.
+  See https://github.com/jtrefke/jitsi-meet-video-conference-server
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Host configuration'
+        Parameters:
+          - FullyQualifiedHostname
+          - InstanceSize
+      - Label:
+          default: 'SSL certificate (optional, one recommended)'
+        Parameters:
+          - SslLetsencryptEmail
+          - SslCertificateCrt
+          - SslCertificateKey
+      - Label:
+          default: 'Meeting authentication (optional, disabled when empty)'
+        Parameters:
+          - MeetingCreatorUsername
+          - MeetingCreatorPassword
+      - Label:
+          default: 'URLs to request pre-install, post-install/reboot (optional, disabled when empty)'
+        Parameters:
+          - HooksPreInstallUrl
+          - HooksPostInstallUrl
+          - HooksWaitTime
+      - Label:
+          default: 'Customizations (optional)'
+        Parameters:
+          - JitsiWatermarkImageUrl
+          - JitsiEnableWelcomePage
+          - JitsiStartAudioMuted
+          - JitsiStartVideoMuted
+          - JitsiRequireDisplayName
+      - Label:
+          default: '[not implemented]'
+        Parameters:
+          - DialinSipAccountUid
+          - DialinSipPassword
+          - DialinSipPhoneNumbers
+          - FirewallEnableSsh
+    ParameterLabels:
+      FullyQualifiedHostname:
+        default: 'Hostname'
+      SslLetsencryptEmail:
+        default: 'Letsencrypt SSL certificate email'
+      SslCertificateCrt:
+        default: 'SSL certificate'
+      SslCertificateKey:
+        default: 'SSL certificate key'
+      FirewallEnableSsh:
+        default: 'SSH exposed'
+      MeetingCreatorUsername:
+        default: 'Meeting creator username'
+      MeetingCreatorPassword:
+        default: 'Meeting creator password'
+      HooksPreInstallUrl:
+        default: 'Pre install request URL'
+      HooksPostInstallUrl:
+        default: 'Post install request URL'
+      HooksWaitTime:
+        default: 'Wait time'
+      InstanceSize:
+        default: 'Instance Size'
+      JitsiWatermarkImageUrl:
+        default: 'Watermark image URL'
+      JitsiEnableWelcomePage:
+        default: 'Enable welcome page'
+      JitsiStartAudioMuted:
+        default: 'Mute audio'
+      JitsiStartVideoMuted:
+        default: 'Mute video'
+      JitsiRequireDisplayName:
+        default: 'Require display name'
+      DialinSipAccountUid:
+        default: 'SIP account UID'
+      DialinSipPassword:
+        default: 'SIP password'
+      DialinSipPhoneNumbers:
+        default: 'SIP phone numbers'
+
+Parameters:
+  FullyQualifiedHostname:
+    Description: Fully qualified hostname (e.g. meet.example.com)
+    Type: String
+    MinLength: 4
+    MaxLength: 255
+    ConstraintDescription: Must be between 4 and 255 characters.
+  SshKeyName:
+    Description: Existing EC2 instance key name
+    Type: String
+    MinLength: 0
+    MaxLength: 255
+    ConstraintDescription: Must be between 0 and 255 characters.
+  MeetingCreatorUsername:
+    Description: Username for the meeting creator account
+    Type: String
+    MinLength: 0
+    MaxLength: 255
+  MeetingCreatorPassword:
+    Description: Password for the meeting creator account
+    NoEcho: true
+    Type: String
+    MinLength: 0
+    MaxLength: 255
+  DialinSipAccountUid:
+    Description: Account UID for SIP account (e.g. 453252@provider.net)
+    Type: String
+    MinLength: 0
+    MaxLength: 255
+  DialinSipPassword:
+    Description: Password for SIP account
+    NoEcho: true
+    Type: String
+    MinLength: 0
+    MaxLength: 255
+  DialinSipPhoneNumbers:
+    Description: Password for SIP account
+    Type: String
+    AllowedPattern: '([^,]+((,[^,]+)+)?)?'
+  SslLetsencryptEmail:
+    Description: E-Mail address for SSL certificate from letsencrypt.org
+    Type: String
+    MaxLength: '255'
+    ConstraintDescription: Must be less than 255 characters.
+  SslCertificateCrt:
+    Description: Existing SSL certificate (base64 encoded)
+    Type: String
+    NoEcho: true
+  SslCertificateKey:
+    Description: Existing SSL certificate key (base64 encoded)
+    Type: String
+    NoEcho: true
+  FirewallEnableSsh:
+    Description: Disable SSH access to this server in firewall
+    Default: true
+    Type: String
+    AllowedValues: [true, false]
+  HooksPreInstallUrl:
+    Description: URL to invoke before installation starts
+    Type: String
+  HooksPostInstallUrl:
+    Description: URL to invoke after installation ends and after reboot
+    Type: String
+  HooksWaitTime:
+    Description: Time to wait after invoking pre or post hooks (in seconds)
+    Type: Number
+    Default: 121
+  JitsiWatermarkImageUrl:
+    Description: Custom watermark image URL that is overlayed in top left corner
+    Type: String
+  JitsiEnableWelcomePage:
+    Description: Enable welcome page at root path
+    Default: true
+    Type: String
+    AllowedValues: [true, false]
+  JitsiStartAudioMuted:
+    Description: Mute audio for new participants after the nth participant enters
+    Type: Number
+    Default: 4
+  JitsiStartVideoMuted:
+    Description: Mute video for new participants after the nth participant enters
+    Type: Number
+    Default: 10
+  JitsiRequireDisplayName:
+    Description: Require participant to enter a display name
+    Type: String
+    AllowedValues: [true, false]
+    Default: true
+
+  InstanceSize:
+    Description: EC2 Instance Type
+    Type: String
+    Default: Small.t3.small
+    AllowedValues:
+    - Micro.t3.micro
+    - Small.t3.small
+    - Medium.t3.medium
+    - Large.m5.large
+    - XtraLarge.m5.xlarge
+    - XtraXtralarge.m5.2xlarge
+
+Mappings:
+  AWSInstanceType2Arch:
+    Micro.t3.micro:
+      InstanceType: t3.micro
+    Small.t3.small:
+      InstanceType: t3.small
+    Medium.t3.medium:
+      InstanceType: t3.medium
+    Large.m5.large:
+      InstanceType: m5.large
+    XtraLarge.m5.xlarge:
+      InstanceType: m5.xlarge
+    XtraXtralarge.m5.2xlarge:
+      InstanceType: m5.2xlarge
+  AWSRegionArch2AMI:
+    us-east-1:
+      HVM64: ami-0a4f4704a9146742a
+    us-east-2:
+      HVM64: ami-004d3abe7e5109c79
+    us-west-1:
+      HVM64: ami-0777d8c544fb25aec
+    us-west-2:
+      HVM64: ami-0e23ea41be77feacd
+    eu-west-1:
+      HVM64: ami-03d8261f577d71b6a
+    eu-west-2:
+      HVM64: ami-0ed2df11a6d41ea78
+    eu-west-3:
+      HVM64: ami-0fd3289ae09a732cd
+    eu-north-1:
+      HVM64: ami-0f6203da33f64adea
+    eu-central-1:
+      HVM64: ami-0b6f46ba4d94838a0
+    ap-northeast-1:
+      HVM64: ami-03b993a5a631b0050
+    ap-northeast-2:
+      HVM64: ami-0d97f5f5359ff205a
+    ap-southeast-1:
+      HVM64: ami-002ea395007afeafb
+    ap-southeast-2:
+      HVM64: ami-07ec7aee8a573b2ae
+    ap-southeast-3:
+      HVM64: ami-0c1c5e417f8137299
+    ap-south-1:
+      HVM64: ami-03aac205d9db3c59e
+    ap-east-1:
+      HVM64: ami-8c195ffd
+    sa-east-1:
+      HVM64: ami-4090f22c
+    ca-central-1:
+      HVM64: ami-05f70cea83f9e5e4b
+    me-south-1:
+      HVM64: ami-0fb7c82ef28f3fa55
+
+Resources:
+  JitsiServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName:
+        Ref: "SshKeyName"
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegionArch2AMI
+        - Ref: AWS::Region
+        - HVM64
+      InstanceType:
+        Fn::FindInMap:
+        - AWSInstanceType2Arch
+        - Ref: InstanceSize
+        - InstanceType
+      SecurityGroups:
+      - Ref: JitsiSecurityGroup
+      Tags:
+      - Key: Name
+        Value:
+          Ref: AWS::StackName
+      UserData:
+        Fn::Base64: !Join
+          - '#'
+          - - !Sub |
+              #!/bin/bash
+              # logs can be found in /var/log/cloud-init-output.log
+              INSTALL_DIR="$(mktemp -d)"
+
+              # defining config
+              cat << EOF > "$INSTALL_DIR/jitsiinstallrc"
+              FULLY_QUALIFIED_HOSTNAME='${FullyQualifiedHostname}'
+              SSL_LETSENCRYPT_EMAIL='${SslLetsencryptEmail}'
+              SSL_CERTIFICATE_CRT=${SslCertificateCrt}
+              SSL_CERTIFICATE_KEY=${SslCertificateKey}
+              FIREWALL_ENABLE_SSH='${FirewallEnableSsh}'
+              HOOKS_PRE_INSTALL_URL='${HooksPreInstallUrl}'
+              HOOKS_POST_INSTALL_URL='${HooksPostInstallUrl}'
+              HOOKS_WAIT_TIME='${HooksWaitTime}'
+              JITSI_MEETING_CREATOR_USERNAME='${MeetingCreatorUsername}'
+              JITSI_MEETING_CREATOR_PASSWORD='${MeetingCreatorPassword}'
+              JITSI_WATERMARK_IMAGE_URL='${JitsiWatermarkImageUrl}'
+              JITSI_ENABLE_WELCOME_PAGE='${JitsiEnableWelcomePage}'
+              JITSI_START_AUDIO_MUTED=${JitsiStartAudioMuted}
+              JITSI_START_VIDEO_MUTED=${JitsiStartVideoMuted}
+              JITSI_REQUIRE_DISPLAY_NAME=${JitsiRequireDisplayName}
+              DIALIN_SIP_ACCOUNT_UID='${DialinSipAccountUid}'
+              DIALIN_SIP_PASSWORD='${DialinSipPassword}'
+              DIALIN_PSTN_NUMBERS='${DialinSipPhoneNumbers}'
+              EOF
+            - |
+              # extract installer
+              command -v curl >/dev/null 2>&1 || apt install -y curl
+              curl -sfL \
+                "https://github.com/jtrefke/jitsi-meet-video-conference-installer/archive/v1.0.0.tar.gz" | \
+                tar -xzf - -C "${INSTALL_DIR}"
+              mv "${INSTALL_DIR}/jitsi-meet-video-conference-installer"*/* "${INSTALL_DIR}"
+              chmod +x "${INSTALL_DIR}/installer/install-jitsi.sh"
+
+              "${INSTALL_DIR}/installer/install-jitsi.sh"
+
+  JitsiSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: VPN Security Groups
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 4443
+        ToPort: 4443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: udp
+        FromPort: 10000
+        ToPort: 20000
+        CidrIp: 0.0.0.0/0
+
+Outputs:
+  JitsiServerHostname:
+    Description: Find Jitsi meet install at
+    Value: !Sub 'https://${FullyQualifiedHostname}'
+  JitsiServerAddress:
+    Description: Initial server IP address
+    Value:
+      Fn::GetAtt:
+        - JitsiServerInstance
+        - PublicIp
+  Info:
+    Description: |
+      Allow a few minutes after launch until the setup has finished.
+
+      Client Downloads:
+      Android: https://play.google.com/store/apps/details?id=org.jitsi.meet /
+      iOS: https://itunes.apple.com/us/app/jitsi-meet/id1165103905 /
+      Slack: https://slack.com/oauth/authorize?client_id=116888949298.122751011265&scope=bot,commands /
+      Desktop: https://desktop.jitsi.org/Main/Download#stableline
+
+      Find more info about Jitsi at https://jitsi.org/
+    Value: Notes
