@@ -89,12 +89,6 @@ Parameters:
     MinLength: 4
     MaxLength: 255
     ConstraintDescription: Must be between 4 and 255 characters.
-  SshKeyName:
-    Description: Existing EC2 instance key name
-    Type: String
-    MinLength: 0
-    MaxLength: 255
-    ConstraintDescription: Must be between 0 and 255 characters.
   MeetingCreatorUsername:
     Description: Username for the meeting creator account
     Type: String
@@ -241,8 +235,6 @@ Resources:
   JitsiServerInstance:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName:
-        Ref: "SshKeyName"
       ImageId:
         Fn::FindInMap:
         - AWSRegionArch2AMI
@@ -302,12 +294,8 @@ Resources:
   JitsiSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: VPN Security Groups
+      GroupDescription: Jitsi Security Groups
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
