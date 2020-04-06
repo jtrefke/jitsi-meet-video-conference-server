@@ -1,35 +1,37 @@
 # AWS CloudFormation Template for Jitsi Meet Video Conference Server
 
 This template installs the open-source Jitsi Meet Video Conference Server on 
-an Amazon Web Services EC2 instance. 
+an Amazon Web Services EC2 instance (fully automated).
 Jitsi is a free, simple multi participant video conference 
 solution, similar to Google Meet, Google Hangouts, Skype Meet Now, or Zoom.
-
 While there is a reference installation at https://meet.jit.si you may want to
-operate your own server for family, friends, neighbors or company-internal for
+operate your own server for family, friends, neighbors, a company, for
 privacy or fun reasons.
 
 This CloudFormation template uses the [Jitsi Meet Video Conference Installer](https://github.com/jtrefke/jitsi-meet-video-conference-installer)
 and is mainly meant for disposable, temporary personal use on the Internet or 
 for use in private networks as security, scalability, or optimized asset 
 delivery has not been a main consideration in the implementation so far.
+This is not to say, that you cannot host a large number of participants 
+(potentially 1000+) depending on the instance size you choose 
+(see https://jitsi.org/jitsi-videobridge-performance-evaluation/).
 
-This is not to say, that you cannot host a large number of participants (
-potentially 1000+) depending on the instance size you choose (see https://jitsi.org/jitsi-videobridge-performance-evaluation/).
-
-**Click the button below to setup your own Jitsi meet video conferencing server in your region**
+**Click the button below to setup your own Jitsi meet video conferencing server in your AWS region**
+<center>
 
 [![Launch CloudFormation Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png
 )](https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=jitsi-meet-video-conference&templateURL=https://cf-templates-1pndz72m6jnrt-eu-west-2.s3.eu-west-2.amazonaws.com/jitsi-server.cfn.yaml)
 
+</center>
+
 ## Used AWS resources
 
-The server setup focuses on a simplicity, ease-of-use and very little AWS 
+The server setup focuses onsimplicity, ease-of-use and very little AWS 
 commitment (both, resource-wise and financially); that means it does not use 
-a lot of resources nor does it require the use of other potentially cost incurring 
+a lot of resources nor does it require the use of other potentially cost-incurring 
 AWS services such as Route 53 or ELBs beyond the EC2 instance.
 
-This template will just create a single EC2 instance with a Ubuntu 18.04 image. 
+This template will just create a single EC2 instance based on a Ubuntu 18.04 image. 
 Some instance sizes are configurable in the template. 
 For on-demand pricing information in your region see: https://aws.amazon.com/ec2/pricing/on-demand/
 
@@ -56,9 +58,9 @@ More importantly, a valid DNS record associated with the AWS EC2 server is
 required in order to obtain a trusted SSL certificate through letsencrypt,
 which is certainly recommended.
 
-If you have not registred a domain or if you cannot easily update the DNS records
-for that domain, a free [Dynamic DNS provider]
-(https://en.wikipedia.org/wiki/Dynamic_DNS) may be helpful.
+If you have not registered a domain or if you cannot easily update the DNS records
+for that domain, a free 
+[Dynamic DNS provider](https://en.wikipedia.org/wiki/Dynamic_DNS) may be helpful.
 The template allows for specifying a URL that will be requested pre and post-
 installation as well as on reboot.
 Most dynamic DNS providers allow for updating a DNS record by simply invoking a
