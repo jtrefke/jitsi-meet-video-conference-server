@@ -26,14 +26,17 @@ This is not to say, that you cannot host a large number of participants
 
 ## Used AWS resources
 
-The server setup focuses onsimplicity, ease-of-use and very little AWS 
+The server setup focuses on simplicity, ease-of-use and very little AWS 
 commitment (both, resource-wise and financially); that means it does not use 
 a lot of resources nor does it require the use of other potentially cost-incurring 
 AWS services such as Route 53 or ELBs beyond the EC2 instance.
 
-This template will just create a single EC2 instance based on a Ubuntu 18.04 image. 
+This template will create an EC2 instance based on a Ubuntu 18.04 image. 
 Some instance sizes are configurable in the template. 
 For on-demand pricing information in your region see: https://aws.amazon.com/ec2/pricing/on-demand/
+
+Furthermore the template provides options to schedule the start and shutdown of 
+the server to save costs and reduce exposure for security reasons.
 
 The template should be executable in the following AWS regions:
 
@@ -94,12 +97,20 @@ short TTL that points to the dynamic DNS name, it is similarly possible to have 
 The CloudFormation stack is meant to quickly produce re-producible results.
 If you don't need use the server, you can just delete the stack which will
 delete the server and its associated resources from your account. 
-Once you need it again, you can just create a new one again in minutes.
+Once you need it again, you can just create a new one again within minutes.
 
 Alternatively, the server can be shut down and started again when needed.
 However, this may incur costs for the storage used while turned off and 
 currently there is no security update mechanism in place which might lead to an
 out-dated system over time (whereas on creation all updates will be installed).
+
+**Creating certificate parameter**
+
+The template includes parameters for existing SSL certificate and key.
+In order to provide the value it needs to be gzipped and base64 encoded without
+new line characters.
+This project includes a helper script `encode-certificate` in the `helpers` 
+directory which will transform an existing file into the required format.
 
 ## Debugging
 
@@ -112,6 +123,4 @@ The logs from the install that runs during the cfn init process is stored in
 
 ## TODOs
 
-- Allow providing scheduled times when the instance is online (through auto scaling groups or AWS instance scheduler)
-- Use `cfn-signal` to ensure that installation was successful
 - Make use of spot instances

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+main() {
+  local certificate_file="${1}"
+  [ -s "${certificate_file}" ] || print_usage "Invalid or empty certificate file!"
+
+  gzip - < "${certificate_file}" | base64 | tr -d "\n"
+  echo
+}
+
+print_usage() {
+  local script; script="$(basename "${BASH_SOURCE[0]}")"
+  echo "$*
+
+DESCRIPTION
+  Encode a given certificate file for the use as a certificate parameter for the
+  AWS Cloudformation template
+
+SYNOPSIS
+  ${script} <CERTIFICATE_FILE>
+
+EXAMPLES
+  ${script} /etc/ssl/certificate.pem
+  ${script} ./cert.key
+" >&2
+  exit 1
+}
+
+main "${@}"

@@ -112,11 +112,11 @@ Parameters:
     MaxLength: '255'
     ConstraintDescription: Must be less than 255 characters.
   SslCertificateCrt:
-    Description: Existing SSL certificate (base64 encoded)
+    Description: Existing SSL certificate (gzipped and base64 encoded (see "helpers/encode-certificate"))
     Type: String
     NoEcho: true
   SslCertificateKey:
-    Description: Existing SSL certificate key (base64 encoded)
+    Description: Existing SSL certificate key (gzipped and base64 encoded (see "helpers/encode-certificate"))
     Type: String
     NoEcho: true
   FirewallEnableSsh:
@@ -411,13 +411,16 @@ Resources:
               }
             - !Sub |
               # create Jitsi installer configuration using provided parameters
+              recode_certificate_value() {
+                [ -n "{1}" ] || echo "{1}" | base64 -d | zcat - | base64 | tr -d "\n"
+              }
               INSTALL_DIR="$(mktemp -d)"
 
               cat << EOF > "$INSTALL_DIR/jitsiinstallrc"
               FULLY_QUALIFIED_HOSTNAME='${FullyQualifiedHostname}'
               SSL_LETSENCRYPT_EMAIL='${SslLetsencryptEmail}'
-              SSL_CERTIFICATE_CRT=${SslCertificateCrt}
-              SSL_CERTIFICATE_KEY=${SslCertificateKey}
+              SSL_CERTIFICATE_CRT="$(recode_certificate_value '${SslCertificateCrt}')"
+              SSL_CERTIFICATE_KEY="$(recode_certificate_value '${SslCertificateKey}')"
               FIREWALL_ENABLE_SSH='${FirewallEnableSsh}'
               HOOKS_PRE_INSTALL_URL='${HooksPreInstallUrl}'
               HOOKS_POST_INSTALL_URL='${HooksPostInstallUrl}'
