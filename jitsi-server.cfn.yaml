@@ -10,6 +10,10 @@ Metadata:
         Parameters:
           - FullyQualifiedHostname
           - InstanceSize
+          - InstanceMaximumHourlyPrice
+      - Label:
+          default: 'Service schedule (optional)'
+        Parameters:
           - InstanceStartupTimes
           - InstanceShutdownTimes
       - Label:
@@ -43,18 +47,15 @@ Metadata:
           - DialinSipAccountUid
           - DialinSipPassword
           - DialinSipPhoneNumbers
-          - FirewallEnableSsh
     ParameterLabels:
       FullyQualifiedHostname:
-        default: 'Hostname'
+        default: '* Hostname'
       SslLetsencryptEmail:
         default: 'Letsencrypt SSL certificate email'
       SslCertificateCrt:
         default: 'SSL certificate'
       SslCertificateKey:
         default: 'SSL certificate key'
-      FirewallEnableSsh:
-        default: 'SSH exposed'
       MeetingCreatorUsername:
         default: 'Meeting creator username'
       MeetingCreatorPassword:
@@ -66,7 +67,9 @@ Metadata:
       HooksWaitTime:
         default: 'Wait time'
       InstanceSize:
-        default: 'Instance Size'
+        default: '* Instance Size'
+      InstanceMaximumHourlyPrice:
+        default: 'Maximum Hourly Price'
       InstanceStartupTimes:
         default: 'Scheduled startup times'
       InstanceShutdownTimes:
@@ -87,6 +90,8 @@ Metadata:
         default: 'SIP password'
       DialinSipPhoneNumbers:
         default: 'SIP phone numbers'
+      SshKeyName:
+        default: 'EC2 SSH key name'
 
 Parameters:
   FullyQualifiedHostname:
@@ -119,11 +124,11 @@ Parameters:
     Description: Existing SSL certificate key (gzipped and base64 encoded (see "helpers/encode-certificate"))
     Type: String
     NoEcho: true
-  FirewallEnableSsh:
-    Description: Disable SSH access to this server in firewall
-    Default: true
-    Type: String
-    AllowedValues: [true, false]
+  # FirewallEnableSsh:
+  #   Description: Disable SSH access to this server in firewall
+  #   Default: true
+  #   Type: String
+  #   AllowedValues: [true, false]
   HooksPreInstallUrl:
     Description: URL to invoke before installation starts
     Type: String
@@ -174,16 +179,22 @@ Parameters:
     Description: Password for SIP account
     Type: String
     AllowedPattern: '([^,]+((,[^,]+)+)?)?'
+  InstanceMaximumHourlyPrice:
+    Description: Maximum price per hour to bid on spot market; if not provided, default on-demand pricing will be used.
+    Type: String
+    AllowedPattern: '([0-9]\.[0-9]+|^$)'
+    ConstraintDescription: 'Must be a dot-separated decimal number'
   InstanceStartupTimes:
     Description: Schedule regular server start in cron syntax (e.g. "3 7 * * 1-5" for "Mon-Fri at 7:03am")
     Type: String
-    AllowedPattern: "(.+ .+ .+ .+ .+|$^)"
+    AllowedPattern: "(.+ .+ .+ .+ .+|^$)"
   InstanceShutdownTimes:
     Description: Schedule regular server shutdown in cron syntax (e.g. "0 19 26 * *" for "every 26th of the month at 7:00pm")
     Type: String
-    AllowedPattern: "(.+ .+ .+ .+ .+|$^)"
+    AllowedPattern: "(.+ .+ .+ .+ .+|^$)"
   SshKeyName:
     Type: String
+    Description: Existing keyname; to be used for debugging purposes only
 
   InstanceSize:
     Description: EC2 Instance Type
@@ -253,6 +264,7 @@ Mappings:
 
 Conditions:
   SshKeyNameProvided: !Not [!Equals [ !Ref SshKeyName, "" ]]
+  InstanceMaximumHourlyPriceProvided: !Not [!Equals [ !Ref InstanceMaximumHourlyPrice, "" ]]
   ScheduledInstanceStartEnabled: !Not [!Equals [ !Ref InstanceStartupTimes, "" ]]
   ScheduledInstanceShutdownEnabled: !Not [!Equals [ !Ref InstanceShutdownTimes, "" ]]
 
@@ -358,6 +370,11 @@ Resources:
         - SshKeyNameProvided
         - Ref: SshKeyName
         - Ref: AWS::NoValue
+      SpotPrice:
+        Fn::If:
+        - InstanceMaximumHourlyPriceProvided
+        - Ref: InstanceMaximumHourlyPrice
+        - Ref: AWS::NoValue
 
       ImageId:
         Fn::FindInMap:
@@ -373,7 +390,7 @@ Resources:
         - InstanceType
       UserData:
         Fn::Base64: !Join
-          - '#'
+          - ''
           - - |
               #!/bin/bash
               # logs can be found in /var/log/cloud-init-output.log
@@ -393,6 +410,7 @@ Resources:
                 ln -sf /root/aws-cfn-bootstrap-latest/init/ubuntu/cfn-hup /etc/init.d/cfn-hup
               )
               fi
+
             - !Sub |
               # Ensure to signal exit to CloudFormation
               trap 'cfn_signal_wait_exit $?' EXIT
@@ -409,7 +427,13 @@ Resources:
                 cfn-signal -e "$1" --stack "${AWS::StackName}" --region "${AWS::Region}" \
                   --reason "$reason" "${WaitHandle}"
               }
+
+            - !If
+              - SshKeyNameProvided
+              - FIREWALL_ENABLE_SSH=true
+              - FIREWALL_ENABLE_SSH=false
             - !Sub |
+
               # create Jitsi installer configuration using provided parameters
               recode_certificate_value() {
                 [ -n "{1}" ] || echo "{1}" | base64 -d | zcat - | base64 | tr -d "\n"
@@ -421,7 +445,7 @@ Resources:
               SSL_LETSENCRYPT_EMAIL='${SslLetsencryptEmail}'
               SSL_CERTIFICATE_CRT="$(recode_certificate_value '${SslCertificateCrt}')"
               SSL_CERTIFICATE_KEY="$(recode_certificate_value '${SslCertificateKey}')"
-              FIREWALL_ENABLE_SSH='${FirewallEnableSsh}'
+              FIREWALL_ENABLE_SSH="$FIREWALL_ENABLE_SSH"
               HOOKS_PRE_INSTALL_URL='${HooksPreInstallUrl}'
               HOOKS_POST_INSTALL_URL='${HooksPostInstallUrl}'
               HOOKS_WAIT_TIME='${HooksWaitTime}'
@@ -437,6 +461,7 @@ Resources:
               DIALIN_PSTN_NUMBERS='${DialinSipPhoneNumbers}'
               EOF
             - |
+
               # install Jitsi with latest automated installer
               latest_tarball=$(
                 curl -sL "https://api.github.com/repos/jtrefke/jitsi-meet-video-conference-installer/releases/latest" | \

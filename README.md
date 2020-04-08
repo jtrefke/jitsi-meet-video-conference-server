@@ -13,7 +13,7 @@ and is mainly meant for disposable, temporary personal use on the Internet or
 for use in private networks as security, scalability, or optimized asset 
 delivery has not been a main consideration in the implementation so far.
 This is not to say, that you cannot host a large number of participants 
-(potentially 1000+) depending on the instance size you choose 
+(potentially 100+) depending on the instance size you choose 
 (see https://jitsi.org/jitsi-videobridge-performance-evaluation/).
 
 **Click the button below to setup your own Jitsi meet video conferencing server in your AWS region**
@@ -34,6 +34,7 @@ AWS services such as Route 53 or ELBs beyond the EC2 instance.
 This template will create an EC2 instance based on a Ubuntu 18.04 image. 
 Some instance sizes are configurable in the template. 
 For on-demand pricing information in your region see: https://aws.amazon.com/ec2/pricing/on-demand/
+For suggested spot market prices in your region (if used) see: https://aws.amazon.com/ec2/spot/pricing/
 
 Furthermore the template provides options to schedule the start and shutdown of 
 the server to save costs and reduce exposure for security reasons.
@@ -74,7 +75,7 @@ be refreshed or for how long they are cached by other DNS servers or the
 operating system (Time To Live (TTL)). 
 Depending on the provider or plan this may be configurable or not and take up
 to a couple of hours.
-To account for this TTL there's an additional wait period that can be specified
+To account for this TTL there is an additional wait period that can be specified
 in the template for the installation to wait so that the DNS record will 
 definitely be updated when needed (for example for the SSL certificate 
 verification).
@@ -104,13 +105,38 @@ However, this may incur costs for the storage used while turned off and
 currently there is no security update mechanism in place which might lead to an
 out-dated system over time (whereas on creation all updates will be installed).
 
-**Creating certificate parameter**
+**Creating certificate parameters**
 
 The template includes parameters for existing SSL certificate and key.
 In order to provide the value it needs to be gzipped and base64 encoded without
 new line characters.
 This project includes a helper script `encode-certificate` in the `helpers` 
 directory which will transform an existing file into the required format.
+
+**Using the AWS EC2 spot market**
+
+This template contains an option to enter a maximum price to bid for AWS spot 
+market servers, i.e. excess server capacities that are up for bidding.
+This means, that, only if there are instances on the spot market in your region
+and the current bidding price is less than the maximum price provided, a 
+server will be started. If the bidding price is too low, though, no server will 
+be started until the price lowers or if the price increased, the server will 
+be terminated (and re-started once the provided price wins a bid).
+Obviously this means, that this concept is only suitable if your service does 
+not require 100% reliability/uptime. 
+However, theoretically, providing a maximum price that is higher or equal to 
+the on-demand price, should always win an instance (if there are any available).
+
+If reliability is not too much of a concern, spot pricing can result in about 
+up to 90% in cost savings. For temporary use this option is should be sufficient
+and cost-effective.
+
+The prices for each region for each instance size can be found here:
+- Spot prices: https://aws.amazon.com/ec2/spot/pricing/
+- On-demand prices: https://aws.amazon.com/ec2/pricing/on-demand/
+
+More information about EC2 spot instances can be found here: 
+https://aws.amazon.com/ec2/spot/
 
 ## Debugging
 
@@ -120,7 +146,3 @@ If something needs debugging on the server side, a key pair needs to be added
 to the template.
 The logs from the install that runs during the cfn init process is stored in
 `/var/log/cloud-init-output.log`.
-
-## TODOs
-
-- Make use of spot instances
