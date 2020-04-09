@@ -397,6 +397,7 @@ Resources:
 
               # prepare instance with AWS CloudFormation utilities
               # based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html#cfn-helper-scripts-reference-downloads
+              export DEBIAN_FRONTEND=noninteractive
               command -v curl >/dev/null 2>&1 || apt install -y curl
               command -v python >/dev/null 2>&1 || apt install -y python
               if ! command -v cfn-signal>/dev/null 2>&1; then
@@ -436,7 +437,7 @@ Resources:
 
               # create Jitsi installer configuration using provided parameters
               recode_certificate_value() {
-                [ -n "{1}" ] || echo "{1}" | base64 -d | zcat - | base64 | tr -d "\n"
+                [ -n "$1" ] || echo "$1" | base64 -d | zcat - | base64 | tr -d "\n"
               }
               INSTALL_DIR="$(mktemp -d)"
 
@@ -465,7 +466,7 @@ Resources:
               # install Jitsi with latest automated installer
               latest_tarball=$(
                 curl -sL "https://api.github.com/repos/jtrefke/jitsi-meet-video-conference-installer/releases/latest" | \
-                sed -En 's/.*tarball_url.+(http[^"]+).*/\1/p'
+                  sed -En 's/.*tarball_url.+(http[^"]+).*/\1/p'
               )
               curl -sL "${latest_tarball}" | tar -xzf - -C "${INSTALL_DIR}"
 
