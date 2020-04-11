@@ -437,7 +437,7 @@ Resources:
 
               # create Jitsi installer configuration using provided parameters
               recode_certificate_value() {
-                [ -n "$1" ] || echo "$1" | base64 -d | zcat - | base64 | tr -d "\n"
+                [ -z "$1" ] || echo "$1" | base64 -d | zcat - | base64 | tr -d "\n"
               }
               INSTALL_DIR="$(mktemp -d)"
 
