@@ -421,7 +421,7 @@ Resources:
                 set +eu || true
                 local reason="SUCCESS"
                 if [ "$1" != "0" ]; then
-                  reason=$(tail -c 100 /var/log/cloud-init-output.log | tr -d"\n" || true)
+                  reason="$(tail -c 100 /var/log/cloud-init-output.log | tr -d "\n" || true)"
                   [ -n "$reason" ] || reason="FAILURE"
                 fi
 
