@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+
+require 'net/http'
+require 'json'
+require 'yaml'
+
+AMI_RELEASE_URL = "https://cloud-images.ubuntu.com/locator/ec2/releasesTable?_=#{Time.now.to_i}"
+AMI_INFO_FIELDS = %w[region name version arch instance_type release ami_id aki_id]
+AMI_INFO_FIELD_TRANSFORMS = { ami_id: :transform_ami_id }
+
+AMI_SEARCH_CRITERIA = {
+  name: 'bionic', version: '18.04 LTS',
+  arch: 'amd64', instance_type: 'hvm:ebs-ssd', aki_id: 'hvm'
+}
+
+module App
+  def main(_args)
+    released_amis = find_released_amis(AMI_SEARCH_CRITERIA)
+    sorted_released_amis = released_amis.sort_by { |info| [info[:region], info[:release]] }
+
+    region_instance_mapping = sorted_released_amis.reduce({}) { |mapping, release|
+      # Only mapping the first release that matches the criteria
+      next unless mapping[release[:region]].nil?
+
+      mapping[release[:region]] = {
+        "comment" => "Ubuntu #{release[:version]} (release #{release[:release]})",
+        "HVM64" => release[:ami_id]
+      }
+      mapping
+    }
+
+    print_yaml(region_instance_mapping)
+  end
+
+  def find_released_amis(criteria = {})
+    releases.select { |data|
+      criteria.keys.all? { |key| data[key] == criteria[key] } &&
+        !data[:region].match?('-gov-')
+    }
+  end
+
+  def releases
+    return @_releases if @_releases
+
+    @_releases = fetch_release_rows.map(&method(:transform_row))
+  end
+
+  def fetch_release_rows
+    json_like_data = Net::HTTP.get(URI(AMI_RELEASE_URL))
+    valid_json_data = json_like_data.gsub(/\,(?=\s*?[\}\]])/, '')
+    release_hash = JSON.parse(valid_json_data)
+    release_hash[release_hash.keys.first]
+  end
+
+  def transform_row(row)
+    row.each_with_index.reduce({}) { |release_hash, value_index|
+      field_value, i = value_index
+      field_key = AMI_INFO_FIELDS[i].to_sym
+      release_hash[field_key] = transform_field_value(field_key, field_value)
+      release_hash
+    }
+  end
+
+  def transform_field_value(key, value)
+    transform_method = AMI_INFO_FIELD_TRANSFORMS[key]
+    transform_method.nil? ? value : method(transform_method).call(value)
+  end
+
+  def transform_ami_id(value)
+    value.gsub(/(<[^>]+>)/, "")
+  end
+
+  def print_yaml(template_hash_snippet)
+    header =  "# Ubuntu AMIs per region as of #{Time.now.utc}\n"
+    header += "# Data from: #{AMI_RELEASE_URL}\n"
+    header += "# Criteria: #{AMI_SEARCH_CRITERIA.map {|k, v| "#{k}='#{v}'"}.join(", ") }"
+    content = template_hash_snippet.to_yaml.sub("---", "#{header}")
+    content = content.gsub('comment:', '#')
+    STDOUT.write(content)
+  end
+end
+
+if __FILE__ == $0
+  include App
+  main(ARGV)
+end

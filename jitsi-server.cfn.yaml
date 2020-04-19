@@ -124,11 +124,6 @@ Parameters:
     Description: Existing SSL certificate key (gzipped and base64 encoded (see "helpers/encode-certificate"))
     Type: String
     NoEcho: true
-  # FirewallEnableSsh:
-  #   Description: Disable SSH access to this server in firewall
-  #   Default: true
-  #   Type: String
-  #   AllowedValues: [true, false]
   HooksPreInstallUrl:
     Description: URL to invoke before installation starts
     Type: String
@@ -223,44 +218,73 @@ Mappings:
     XtraXtralarge.m5.2xlarge:
       InstanceType: m5.2xlarge
   AWSRegionArch2AMI:
-    us-east-1:
-      HVM64: ami-0a4f4704a9146742a
-    us-east-2:
-      HVM64: ami-004d3abe7e5109c79
-    us-west-1:
-      HVM64: ami-0777d8c544fb25aec
-    us-west-2:
-      HVM64: ami-0e23ea41be77feacd
-    eu-west-1:
-      HVM64: ami-03d8261f577d71b6a
-    eu-west-2:
-      HVM64: ami-0ed2df11a6d41ea78
-    eu-west-3:
-      HVM64: ami-0fd3289ae09a732cd
-    eu-north-1:
-      HVM64: ami-0f6203da33f64adea
-    eu-central-1:
-      HVM64: ami-0b6f46ba4d94838a0
-    ap-northeast-1:
-      HVM64: ami-03b993a5a631b0050
-    ap-northeast-2:
-      HVM64: ami-0d97f5f5359ff205a
-    ap-southeast-1:
-      HVM64: ami-002ea395007afeafb
-    ap-southeast-2:
-      HVM64: ami-07ec7aee8a573b2ae
-    ap-southeast-3:
-      HVM64: ami-0c1c5e417f8137299
-    ap-south-1:
-      HVM64: ami-03aac205d9db3c59e
+    # Ubuntu AMIs per region as of 2020-04-19 02:17:19 UTC
+    # Data from: https://cloud-images.ubuntu.com/locator/ec2/releasesTable?_=1587262638
+    # Criteria: name='bionic', version='18.04 LTS', arch='amd64', instance_type='hvm:ebs-ssd', aki_id='hvm'
     ap-east-1:
-      HVM64: ami-8c195ffd
-    sa-east-1:
-      HVM64: ami-4090f22c
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-c790d6b6
+    ap-northeast-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0278fe6949f6b1a06
+    ap-northeast-2:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-00edfb46b107f643c
+    ap-northeast-3:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-00eac2261db3c9df5
+    ap-south-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0b44050b2d893d5f7
+    ap-southeast-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0f7719e8b7ba25c61
+    ap-southeast-2:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-04fcc97b5f6edcd89
     ca-central-1:
-      HVM64: ami-05f70cea83f9e5e4b
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0edd51cc29813e254
+    cn-north-1:
+      # Ubuntu 18.04 LTS (release 20200323)
+      HVM64: ami-0071f6f4df15863cc
+    cn-northwest-1:
+      # Ubuntu 18.04 LTS (release 20200323)
+      HVM64: ami-0a22b8776bb32836b
+    eu-central-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0e342d72b12109f91
+    eu-north-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-050981837962d44ac
+    eu-west-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0701e7be9b2a77600
+    eu-west-2:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0eb89db7593b5d434
+    eu-west-3:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-08c757228751c5335
     me-south-1:
-      HVM64: ami-0fb7c82ef28f3fa55
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-051274f257aba97f9
+    sa-east-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-077d5d3682940b34a
+    us-east-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-085925f297f89fce1
+    us-east-2:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-07c1207a9d40bc3bd
+    us-west-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0f56279347d2fa43e
+    us-west-2:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-003634241a8fcdec0
+
 
 Conditions:
   SshKeyNameProvided: !Not [!Equals [ !Ref SshKeyName, "" ]]
