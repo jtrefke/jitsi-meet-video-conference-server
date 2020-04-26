@@ -42,11 +42,17 @@ Metadata:
           - JitsiStartVideoMuted
           - JitsiRequireDisplayName
       - Label:
-          default: '[not implemented]'
+          default: 'Developer options'
+        Parameters:
+          - InstallerVersion
+          - SshKeyName
+      - Label:
+          default: 'Work in progess / experimental'
         Parameters:
           - DialinSipAccountUid
           - DialinSipPassword
           - DialinSipPhoneNumbers
+
     ParameterLabels:
       FullyQualifiedHostname:
         default: '* Hostname'
@@ -90,6 +96,8 @@ Metadata:
         default: 'SIP password'
       DialinSipPhoneNumbers:
         default: 'SIP phone numbers'
+      InstallerVersion:
+        default: 'Jitsi Installer Version'
       SshKeyName:
         default: 'EC2 SSH key name'
 
@@ -151,7 +159,7 @@ Parameters:
   JitsiStartVideoMuted:
     Description: Mute video for new participants after the nth participant enters
     Type: Number
-    Default: 10
+    Default: 8
     MinValue: 0
     MaxValue: 1000
   JitsiRequireDisplayName:
@@ -187,6 +195,11 @@ Parameters:
     Description: Schedule regular server shutdown in cron syntax (e.g. "0 19 26 * *" for "every 26th of the month at 7:00pm")
     Type: String
     AllowedPattern: "(.+ .+ .+ .+ .+|^$)"
+  InstallerVersion:
+    Type: String
+    MinLength: 5
+    Description: Version of installer (release tag) or 'latest'
+    Default: latest
   SshKeyName:
     Type: String
     Description: Existing keyname; to be used for debugging purposes only
@@ -423,7 +436,6 @@ Resources:
               # based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html#cfn-helper-scripts-reference-downloads
               export DEBIAN_FRONTEND=noninteractive
               command -v curl >/dev/null 2>&1 || apt install -y curl
-              command -v python >/dev/null 2>&1 || apt install -y python
               command -v python >/dev/null 2>&1 || apt install -y python-minimal
               if ! command -v cfn-signal>/dev/null 2>&1; then
               (
@@ -460,6 +472,8 @@ Resources:
               - FIREWALL_ENABLE_SSH=false
             - !Sub |
 
+              INSTALLER_VERSION='${InstallerVersion}'
+
               # create Jitsi installer configuration using provided parameters
               recode_certificate_value() {
                 [ -z "$1" ] || echo "$1" | base64 -d | zcat - | base64 | tr -d "\n"
@@ -489,14 +503,15 @@ Resources:
             - |
 
               # install Jitsi with latest automated installer
-              latest_tarball=$(
-                curl -sL "https://api.github.com/repos/jtrefke/jitsi-meet-video-conference-installer/releases/latest" | \
-                  sed -En 's/.*tarball_url.+(http[^"]+).*/\1/p'
-              )
-              curl -sL "${latest_tarball}" | tar -xzf - -C "${INSTALL_DIR}"
+              INSTALLER_URL="https://api.github.com/repos/jtrefke/jitsi-meet-video-conference-installer/releases/latest"
+              if [ "${INSTALLER_VERSION:-}" != "latest" ]; then
+                INSTALLER_URL="https://api.github.com/repos/jtrefke/jitsi-meet-video-conference-installer/releases/tags/${INSTALLER_VERSION}"
+              fi
 
-              mv "${INSTALL_DIR}/jtrefke-jitsi-meet-video-conference-installer"*/* \
-                "${INSTALL_DIR}"
+              INSTALLER_TARBALL=$(curl -sL "${INSTALLER_URL}" | sed -En 's/.*tarball_url.+(http[^"]+).*/\1/p')
+              curl -sL "${INSTALLER_TARBALL}" | tar -xzf - -C "${INSTALL_DIR}"
+
+              mv "${INSTALL_DIR}/jtrefke-jitsi-meet-video-conference-installer"*/* "${INSTALL_DIR}"
               chmod +x "${INSTALL_DIR}/installer/install-jitsi.sh"
 
               "${INSTALL_DIR}/installer/install-jitsi.sh"
