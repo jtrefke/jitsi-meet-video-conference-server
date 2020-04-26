@@ -435,6 +435,7 @@ Resources:
               # prepare instance with AWS CloudFormation utilities
               # based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html#cfn-helper-scripts-reference-downloads
               export DEBIAN_FRONTEND=noninteractive
+              apt update -y
               command -v curl >/dev/null 2>&1 || apt install -y curl
               command -v python >/dev/null 2>&1 || apt install -y python-minimal
               if ! command -v cfn-signal>/dev/null 2>&1; then
