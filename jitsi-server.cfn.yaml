@@ -424,6 +424,7 @@ Resources:
               export DEBIAN_FRONTEND=noninteractive
               command -v curl >/dev/null 2>&1 || apt install -y curl
               command -v python >/dev/null 2>&1 || apt install -y python
+              command -v python >/dev/null 2>&1 || apt install -y python-minimal
               if ! command -v cfn-signal>/dev/null 2>&1; then
               (
                 apt install -y python-requests
