@@ -298,7 +298,6 @@ Mappings:
       # Ubuntu 18.04 LTS (release 20200408)
       HVM64: ami-003634241a8fcdec0
 
-
 Conditions:
   SshKeyNameProvided: !Not [!Equals [ !Ref SshKeyName, "" ]]
   InstanceMaximumHourlyPriceProvided: !Not [!Equals [ !Ref InstanceMaximumHourlyPrice, "" ]]
@@ -431,24 +430,43 @@ Resources:
           - - |
               #!/bin/bash
               # logs can be found in /var/log/cloud-init-output.log
+              ensure_python2_active() {
+                major_python_version=$(python -V | grep -Eo "[0-9]" | head -1)
+                [ "${major_python_version}" != "2" ] || return 0
 
-              # prepare instance with AWS CloudFormation utilities
-              # based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html#cfn-helper-scripts-reference-downloads
+                if ! command -v "python2" >/dev/null 2>&1; then
+                  apt install -y python-minimal || true
+                  apt install -y python2 || true
+                  apt install -y python-requests || true
+                fi
+
+                if command -v "python2" >/dev/null 2>&1; then
+                  ln -sf $(command -v "python2") /usr/bin/python
+                fi
+              }
+
+              ensure_cfn_signal_installed() {
+                ! command -v cfn-signal>/dev/null 2>&1 || return 0
+
+                # prepare instance with AWS CloudFormation utilities
+                # based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html#cfn-helper-scripts-reference-downloads
+                ensure_python2_active
+                apt install -y python-requests
+                (
+                  cd "$(mktemp -d)"
+                  curl -sL "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz" | \
+                    tar -xzf -
+                  cd ./*
+                  python setup.py install
+                  ln -sf /root/aws-cfn-bootstrap-latest/init/ubuntu/cfn-hup /etc/init.d/cfn-hup
+                )
+              }
+
               export DEBIAN_FRONTEND=noninteractive
               apt update -y
               command -v curl >/dev/null 2>&1 || apt install -y curl
-              command -v python >/dev/null 2>&1 || apt install -y python-minimal
-              if ! command -v cfn-signal>/dev/null 2>&1; then
-              (
-                apt install -y python-requests
-                cd "$(mktemp -d)"
-                curl -sL "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz" | \
-                  tar -xzf -
-                cd ./*
-                python setup.py install
-                ln -sf /root/aws-cfn-bootstrap-latest/init/ubuntu/cfn-hup /etc/init.d/cfn-hup
-              )
-              fi
+
+              ensure_cfn_signal_installed
 
             - !Sub |
               # Ensure to signal exit to CloudFormation
