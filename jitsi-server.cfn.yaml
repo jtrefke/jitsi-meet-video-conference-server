@@ -231,9 +231,12 @@ Mappings:
     XtraXtralarge.m5.2xlarge:
       InstanceType: m5.2xlarge
   AWSRegionArch2AMI:
-    # Ubuntu AMIs per region as of 2020-04-19 02:17:19 UTC
-    # Data from: https://cloud-images.ubuntu.com/locator/ec2/releasesTable?_=1587262638
+    # Ubuntu AMIs per region as of 2020-04-26 20:54:48 UTC
+    # Data from: https://cloud-images.ubuntu.com/locator/ec2/releasesTable?_=1587934487
     # Criteria: name='bionic', version='18.04 LTS', arch='amd64', instance_type='hvm:ebs-ssd', aki_id='hvm'
+    af-south-1:
+      # Ubuntu 18.04 LTS (release 20200408)
+      HVM64: ami-0914f03407aa25fb8
     ap-east-1:
       # Ubuntu 18.04 LTS (release 20200408)
       HVM64: ami-c790d6b6

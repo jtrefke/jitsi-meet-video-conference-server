@@ -41,15 +41,17 @@ the server to save costs and reduce exposure for security reasons.
 
 The template should be executable in the following AWS regions:
 
-| Americas     | Europe/ME      | Asia Pacific   |
-|--------------|----------------|-----------------
-| us-east-1    | eu-west-1      | ap-northeast-1 |
-| us-east-2    | eu-west-2      | ap-northeast-2 |
-| us-west-1    | eu-west-3      | ap-southeast-1 |
-| us-west-2    | eu-north-1     | ap-southeast-2 |
-| ca-central-1 | eu-central-1   | ap-southeast-3 |
-| sa-east-1    | me-south-1     | ap-south-1     |
-|              |                | ap-east-1      |
+| Americas     | Europe/ME/Africa | Asia Pacific   |
+|--------------|------------------|-----------------
+| us-west-1    | eu-west-1        | ap-northeast-1 |
+| us-west-2    | eu-west-2        | ap-northeast-2 |
+| ca-central-1 | eu-west-3        | ap-northeast-3 |
+| us-east-1    | eu-north-1       | ap-east-1      |
+| us-east-2    | eu-central-1     | ap-southeast-1 |
+| sa-east-1    | me-south-1       | ap-southeast-2 |
+|              | af-south-1       | ap-south-1     |
+|              |                  | cn-north-1     |
+|              |                  | cn-northwest-1 |
 
 ## Tips and tricks
 
