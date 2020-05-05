@@ -438,9 +438,8 @@ Resources:
                 [ "${major_python_version}" != "2" ] || return 0
 
                 if ! command -v "python2" >/dev/null 2>&1; then
-                  apt install -y python-minimal || true
-                  apt install -y python2 || true
-                  apt install -y python-requests || true
+                  apt-install -y python-minimal || true
+                  apt-install -y python2 || true
                 fi
 
                 if command -v "python2" >/dev/null 2>&1; then
@@ -454,7 +453,8 @@ Resources:
                 # prepare instance with AWS CloudFormation utilities
                 # based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html#cfn-helper-scripts-reference-downloads
                 ensure_python2_active
-                apt install -y python-requests
+                apt install -y python-requests || true
+                apt install -y python-setuptools || true
                 (
                   cd "$(mktemp -d)"
                   curl -sL "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz" | \
