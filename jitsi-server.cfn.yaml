@@ -12,35 +12,37 @@ Metadata:
           - InstanceSize
           - InstanceMaximumHourlyPrice
       - Label:
-          default: 'Service schedule (optional)'
-        Parameters:
-          - InstanceStartupTimes
-          - InstanceShutdownTimes
-      - Label:
           default: 'SSL certificate (optional, one recommended)'
         Parameters:
           - SslLetsencryptEmail
           - SslCertificateCrt
           - SslCertificateKey
       - Label:
-          default: 'Meeting authentication (optional, disabled when empty)'
+          default: 'Jitsi meeting authentication (optional, disabled when empty)'
         Parameters:
           - MeetingCreatorUsername
           - MeetingCreatorPassword
       - Label:
-          default: 'URLs to request pre-install, post-install/reboot (optional, disabled when empty)'
-        Parameters:
-          - HooksPreInstallUrl
-          - HooksPostInstallUrl
-          - HooksWaitTime
-      - Label:
           default: 'Jitsi customizations (optional)'
         Parameters:
-          - JitsiWatermarkImageUrl
           - JitsiEnableWelcomePage
+          - JitsiRequireDisplayName
           - JitsiStartAudioMuted
           - JitsiStartVideoMuted
-          - JitsiRequireDisplayName
+          - JitsiDisableAudioLevels
+          - JitsiWatermarkImageUrl
+      - Label:
+          default: 'Service schedule (optional)'
+        Parameters:
+          - InstanceStartupTimes
+          - InstanceShutdownTimes
+      - Label:
+          default: 'Hooks to invoke pre-install, post-install/reboot (optional, disabled when empty)'
+        Parameters:
+          - HooksPreInstall
+          - HooksCustomize
+          - HooksPostInstall
+          - HooksWaitTime
       - Label:
           default: 'Developer options'
         Parameters:
@@ -66,10 +68,12 @@ Metadata:
         default: 'Meeting creator username'
       MeetingCreatorPassword:
         default: 'Meeting creator password'
-      HooksPreInstallUrl:
-        default: 'Pre install request URL'
-      HooksPostInstallUrl:
-        default: 'Post install request URL'
+      HooksPreInstall:
+        default: 'Pre install hook'
+      HooksPostInstall:
+        default: 'Post install hook'
+      HooksCustomize:
+        default: 'Customization hook'
       HooksWaitTime:
         default: 'Wait time'
       InstanceSize:
@@ -84,6 +88,8 @@ Metadata:
         default: 'Watermark image URL'
       JitsiEnableWelcomePage:
         default: 'Enable welcome page'
+      JitsiDisableAudioLevels:
+        default: 'Disable audio level indicators'
       JitsiStartAudioMuted:
         default: 'Mute audio'
       JitsiStartVideoMuted:
@@ -120,26 +126,29 @@ Parameters:
     MinLength: 0
     MaxLength: 255
   SslLetsencryptEmail:
-    Description: E-Mail address for SSL certificate from letsencrypt.org
+    Description: E-mail address for retrieving SSL certificate from letsencrypt.org
     Type: String
     MaxLength: '255'
     ConstraintDescription: Must be less than 255 characters.
   SslCertificateCrt:
-    Description: Existing SSL certificate (gzipped and base64 encoded (see "helpers/encode-certificate"))
+    Description: Existing SSL certificate (gzipped and base64 encoded (see "helpers/encode-file-parameter"))
     Type: String
     NoEcho: true
   SslCertificateKey:
-    Description: Existing SSL certificate key (gzipped and base64 encoded (see "helpers/encode-certificate"))
+    Description: Existing SSL certificate key (gzipped and base64 encoded (see "helpers/encode-file-parameter"))
     Type: String
     NoEcho: true
-  HooksPreInstallUrl:
-    Description: URL to invoke before installation starts
+  HooksPreInstall:
+    Description: Regular URL or encoded script (see "helpers/encode-file-parameter")) to invoke before installation starts
     Type: String
-  HooksPostInstallUrl:
-    Description: URL to invoke after installation ends and after reboot
+  HooksCustomize:
+    Description: Encoded script (see "helpers/encode-file-parameter")) to run or regular URL to invoke after Jisti install
+    Type: String
+  HooksPostInstall:
+    Description: Regular URL or encoded script (see "helpers/encode-file-parameter")) to invoke after setup is finished and at each reboot
     Type: String
   HooksWaitTime:
-    Description: Time to wait after invoking pre or post hooks (in seconds)
+    Description: Time to wait after invoking hooks (in seconds)
     Type: Number
     Default: 121
   JitsiWatermarkImageUrl:
@@ -148,6 +157,11 @@ Parameters:
   JitsiEnableWelcomePage:
     Description: Enable welcome page at root path
     Default: true
+    Type: String
+    AllowedValues: [true, false]
+  JitsiDisableAudioLevels:
+    Description: Disable display of audio level indicators for participants
+    Default: false
     Type: String
     AllowedValues: [true, false]
   JitsiStartAudioMuted:
@@ -205,7 +219,7 @@ Parameters:
     Description: Existing keyname; to be used for debugging purposes only
 
   InstanceSize:
-    Description: EC2 Instance Type
+    Description: EC2 instance type
     Type: String
     Default: Small.t3.small
     AllowedValues:
@@ -432,14 +446,15 @@ Resources:
           - ''
           - - |
               #!/bin/bash
+              # script is placed in /var/lib/cloud/instances/*/scripts/part-*
               # logs can be found in /var/log/cloud-init-output.log
               ensure_python2_active() {
                 major_python_version=$(python -V | grep -Eo "[0-9]" | head -1)
                 [ "${major_python_version}" != "2" ] || return 0
 
                 if ! command -v "python2" >/dev/null 2>&1; then
-                  apt-install -y python-minimal || true
-                  apt-install -y python2 || true
+                  apt install -y python-minimal || true
+                  apt install -y python2 || true
                 fi
 
                 if command -v "python2" >/dev/null 2>&1; then
@@ -497,24 +512,33 @@ Resources:
               INSTALLER_VERSION='${InstallerVersion}'
 
               # create Jitsi installer configuration using provided parameters
-              recode_certificate_value() {
+              recode_parameter() {
                 [ -z "$1" ] || echo "$1" | base64 -d | zcat - | base64 | tr -d "\n"
               }
+              starts_with_curl_url_scheme() {
+                <<<"$1" grep -Eiq "^(dict|file|ftps?|gopher|https?|imaps?|ldaps?|mqtt|pop3s?|rtmp|rtsp|scp|sftp|smbs?|smtps?|telnet|tftp)://"
+              }
+              keep_url_or_recode() {
+                starts_with_curl_url_scheme "$1" && echo "$1" || recode_parameter "$1"
+              }
+
               INSTALL_DIR="$(mktemp -d)"
 
               cat << EOF > "$INSTALL_DIR/jitsiinstallrc"
               FULLY_QUALIFIED_HOSTNAME='${FullyQualifiedHostname}'
               SSL_LETSENCRYPT_EMAIL='${SslLetsencryptEmail}'
-              SSL_CERTIFICATE_CRT="$(recode_certificate_value '${SslCertificateCrt}')"
-              SSL_CERTIFICATE_KEY="$(recode_certificate_value '${SslCertificateKey}')"
+              SSL_CERTIFICATE_CRT="$(recode_parameter '${SslCertificateCrt}')"
+              SSL_CERTIFICATE_KEY="$(recode_parameter '${SslCertificateKey}')"
               FIREWALL_ENABLE_SSH="$FIREWALL_ENABLE_SSH"
-              HOOKS_PRE_INSTALL_URL='${HooksPreInstallUrl}'
-              HOOKS_POST_INSTALL_URL='${HooksPostInstallUrl}'
+              HOOKS_PRE_INSTALL="$(keep_url_or_recode '${HooksPreInstall}')"
+              HOOKS_POST_INSTALL="$(keep_url_or_recode '${HooksPostInstall}')"
+              HOOKS_CUSTOMIZE="$(keep_url_or_recode '${HooksCustomize}')"
               HOOKS_WAIT_TIME='${HooksWaitTime}'
               JITSI_MEETING_CREATOR_USERNAME='${MeetingCreatorUsername}'
               JITSI_MEETING_CREATOR_PASSWORD='${MeetingCreatorPassword}'
               JITSI_WATERMARK_IMAGE_URL='${JitsiWatermarkImageUrl}'
               JITSI_ENABLE_WELCOME_PAGE='${JitsiEnableWelcomePage}'
+              JITSI_DISABLE_AUDIO_LEVELS=${JitsiDisableAudioLevels}
               JITSI_START_AUDIO_MUTED=${JitsiStartAudioMuted}
               JITSI_START_VIDEO_MUTED=${JitsiStartVideoMuted}
               JITSI_REQUIRE_DISPLAY_NAME=${JitsiRequireDisplayName}

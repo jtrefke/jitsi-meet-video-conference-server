@@ -112,7 +112,7 @@ out-dated system over time (whereas on creation all updates will be installed).
 The template includes parameters for existing SSL certificate and key.
 In order to provide the value it needs to be gzipped and base64 encoded without
 new line characters.
-This project includes a helper script `encode-certificate` in the `helpers` 
+This project includes a helper script `encode-file-parameters` in the `helpers` 
 directory which will transform an existing file into the required format.
 
 **Using the AWS EC2 spot market**

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+main() {
+  local file="${1}"
+  [ -s "${file}" ] || print_usage "Invalid or empty file file!"
+
+  gzip - < "${file}" | base64 | tr -d "\n"
+  echo
+}
+
+print_usage() {
+  local script; script="$(basename "${BASH_SOURCE[0]}")"
+  echo "$*
+
+DESCRIPTION
+  Encode a given file for the use as a file parameter for the
+  AWS Cloudformation template
+
+SYNOPSIS
+  ${script} <FILE_PATH>
+
+EXAMPLES
+  ${script} /etc/ssl/file.pem
+  ${script} ./cert.key
+  ${script} ./bin/script.sh
+" >&2
+  exit 1
+}
+
+main "${@}"
