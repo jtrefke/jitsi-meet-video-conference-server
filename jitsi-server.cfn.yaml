@@ -139,13 +139,13 @@ Parameters:
     Type: String
     NoEcho: true
   HooksPreInstall:
-    Description: Regular URL or encoded script (see "helpers/encode-file-parameter")) to invoke before installation starts
+    Description: Regular URL or encoded script (see "helpers/encode-file-parameter") to invoke before installation starts
     Type: String
   HooksCustomize:
-    Description: Encoded script (see "helpers/encode-file-parameter")) to run or regular URL to invoke after Jisti install
+    Description: Encoded script (see "helpers/encode-file-parameter") to run or regular URL to invoke after Jisti install
     Type: String
   HooksPostInstall:
-    Description: Regular URL or encoded script (see "helpers/encode-file-parameter")) to invoke after setup is finished and at each reboot
+    Description: Regular URL or encoded script (see "helpers/encode-file-parameter") to invoke after setup is finished and at each reboot
     Type: String
   HooksWaitTime:
     Description: Time to wait after invoking hooks (in seconds)
@@ -197,7 +197,7 @@ Parameters:
     Type: String
     AllowedPattern: '([^,]+((,[^,]+)+)?)?'
   InstanceMaximumHourlyPrice:
-    Description: Maximum price per hour to bid on spot market; if not provided, default on-demand pricing will be used.
+    Description: Maximum price per hour to bid on spot market; if not provided, default on-demand pricing will be used (see https://aws.amazon.com/ec2/spot/pricing/ for spot prices).
     Type: String
     AllowedPattern: '([0-9]\.[0-9]+|^$)'
     ConstraintDescription: 'Must be a dot-separated decimal number'
