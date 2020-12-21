@@ -636,76 +636,80 @@ Mappings:
       InstanceType: c4.4xlarge
     c4.8xlarge:
       InstanceType: c4.8xlarge
+
   AWSRegionArch2AMI:
-    # Ubuntu AMIs per region as of 2020-04-26 20:54:48 UTC
-    # Data from: https://cloud-images.ubuntu.com/locator/ec2/releasesTable?_=1587934487
+    # Ubuntu AMIs per region as of 2020-12-21 01:12:06 UTC
+    # Data from: https://cloud-images.ubuntu.com/locator/ec2/releasesTable?_=1608513126
     # Criteria: name='bionic', version='18.04 LTS', arch='amd64', instance_type='hvm:ebs-ssd', aki_id='hvm'
     af-south-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0914f03407aa25fb8
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-083e3cf5f76fe3666
     ap-east-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-c790d6b6
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-14c58865
     ap-northeast-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0278fe6949f6b1a06
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-05855b7c54f91a1ae
     ap-northeast-2:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-00edfb46b107f643c
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-063acefae626a1e95
     ap-northeast-3:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-00eac2261db3c9df5
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-091f16ae91eabba28
     ap-south-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0b44050b2d893d5f7
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0e93e3ec2cdacb2ef
     ap-southeast-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0f7719e8b7ba25c61
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0311dbbdd981577d5
     ap-southeast-2:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-04fcc97b5f6edcd89
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0dea9aeaa95b9751b
     ca-central-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0edd51cc29813e254
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-02534c23739f953e0
     cn-north-1:
-      # Ubuntu 18.04 LTS (release 20200323)
-      HVM64: ami-0071f6f4df15863cc
+      # Ubuntu 18.04 LTS (release 20201112)
+      HVM64: ami-05248307900d52e3a
     cn-northwest-1:
-      # Ubuntu 18.04 LTS (release 20200323)
-      HVM64: ami-0a22b8776bb32836b
+      # Ubuntu 18.04 LTS (release 20201112)
+      HVM64: ami-075c9f159ee0bdc1c
     eu-central-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0e342d72b12109f91
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-08a099fcfc36dff3f
     eu-north-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-050981837962d44ac
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0a7e3117f91bf347f
+    eu-south-1:
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0125f7def0bcc9629
     eu-west-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0701e7be9b2a77600
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-00c25f7948e360133
     eu-west-2:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0eb89db7593b5d434
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-076071bbe3485317c
     eu-west-3:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-08c757228751c5335
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0b013f780a3e3b940
     me-south-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-051274f257aba97f9
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-08cb887b2c7ff17c3
     sa-east-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-077d5d3682940b34a
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0487f0735540f9ef5
     us-east-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-085925f297f89fce1
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-053adf54573f777cf
     us-east-2:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-07c1207a9d40bc3bd
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0b9487791bf873774
     us-west-1:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-0f56279347d2fa43e
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-07509d53ed1aa0b33
     us-west-2:
-      # Ubuntu 18.04 LTS (release 20200408)
-      HVM64: ami-003634241a8fcdec0
+      # Ubuntu 18.04 LTS (release 20201211.1)
+      HVM64: ami-0cc158853935719b7
 
 Conditions:
   SshKeyNameProvided: !Not [!Equals [ !Ref SshKeyName, "" ]]

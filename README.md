@@ -48,9 +48,9 @@ The template should be executable in the following AWS regions:
 | ca-central-1 | eu-west-3        | ap-northeast-3 |
 | us-east-1    | eu-north-1       | ap-east-1      |
 | us-east-2    | eu-central-1     | ap-southeast-1 |
-| sa-east-1    | me-south-1       | ap-southeast-2 |
-|              | af-south-1       | ap-south-1     |
-|              |                  | cn-north-1     |
+| sa-east-1    | eu-south-1       | ap-southeast-2 |
+|              | me-south-1       | ap-south-1     |
+|              | af-south-1       | cn-north-1     |
 |              |                  | cn-northwest-1 |
 
 ## Tips and tricks
