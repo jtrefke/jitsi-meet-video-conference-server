@@ -223,12 +223,144 @@ Parameters:
     Type: String
     Default: Small.t3.small
     AllowedValues:
+    - '----- Choose from simple options below (recommended, widely available) -----'
     - Micro.t3.micro
     - Small.t3.small
     - Medium.t3.medium
     - Large.m5.large
     - XtraLarge.m5.xlarge
     - XtraXtralarge.m5.2xlarge
+    - '----- Comprehensive options (may be unavailable in certain regions) -----'
+    - t3.nano
+    - t3.micro
+    - t3.small
+    - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
+    - t3a.nano
+    - t3a.micro
+    - t3a.small
+    - t3a.medium
+    - t3a.large
+    - t3a.xlarge
+    - t3a.2xlarge
+    - t2.nano
+    - t2.micro
+    - t2.small
+    - t2.medium
+    - t2.large
+    - t2.xlarge
+    - t2.2xlarge
+    - m5.large
+    - m5.xlarge
+    - m5.2xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.12xlarge
+    - m5.16xlarge
+    - m5.24xlarge
+    - m5.metal
+    - m5d.large
+    - m5d.xlarge
+    - m5d.2xlarge
+    - m5d.4xlarge
+    - m5d.8xlarge
+    - m5d.12xlarge
+    - m5d.16xlarge
+    - m5d.24xlarge
+    - m5d.metal
+    - m5a.large
+    - m5a.xlarge
+    - m5a.2xlarge
+    - m5a.4xlarge
+    - m5a.8xlarge
+    - m5a.12xlarge
+    - m5a.16xlarge
+    - m5a.24xlarge
+    - m5ad.large
+    - m5ad.xlarge
+    - m5ad.2xlarge
+    - m5ad.4xlarge
+    - m5ad.8xlarge
+    - m5ad.12xlarge
+    - m5ad.16xlarge
+    - m5ad.24xlarge
+    - m5n.large
+    - m5n.xlarge
+    - m5n.2xlarge
+    - m5n.4xlarge
+    - m5n.8xlarge
+    - m5n.12xlarge
+    - m5n.16xlarge
+    - m5n.24xlarge
+    - m5dn.large
+    - m5dn.xlarge
+    - m5dn.2xlarge
+    - m5dn.4xlarge
+    - m5dn.8xlarge
+    - m5dn.12xlarge
+    - m5dn.16xlarge
+    - m5dn.24xlarge
+    - m5zn.large
+    - m5zn.xlarge
+    - m5zn.2xlarge
+    - m5zn.3xlarge
+    - m5zn.6xlarge
+    - m5zn.12xlarge
+    - m5zn.metal
+    - m4.large
+    - m4.xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.10xlarge
+    - m4.16xlarge
+    - c5.large
+    - c5.xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.12xlarge
+    - c5.18xlarge
+    - c5.24xlarge
+    - c5.metal
+    - c5d.large
+    - c5d.xlarge
+    - c5d.2xlarge
+    - c5d.4xlarge
+    - c5d.9xlarge
+    - c5d.12xlarge
+    - c5d.18xlarge
+    - c5d.24xlarge
+    - c5d.metal
+    - c5a.large
+    - c5a.xlarge
+    - c5a.2xlarge
+    - c5a.4xlarge
+    - c5a.8xlarge
+    - c5a.12xlarge
+    - c5a.16xlarge
+    - c5a.24xlarge
+    - c5ad.large
+    - c5ad.xlarge
+    - c5ad.2xlarge
+    - c5ad.4xlarge
+    - c5ad.8xlarge
+    - c5ad.12xlarge
+    - c5ad.16xlarge
+    - c5ad.24xlarge
+    - c5n.large
+    - c5n.xlarge
+    - c5n.2xlarge
+    - c5n.4xlarge
+    - c5n.9xlarge
+    - c5n.18xlarge
+    - c5n.metal
+    - c4.large
+    - c4.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
 
 Mappings:
   AWSInstanceType2Arch:
@@ -244,6 +376,266 @@ Mappings:
       InstanceType: m5.xlarge
     XtraXtralarge.m5.2xlarge:
       InstanceType: m5.2xlarge
+    t3.nano:
+      InstanceType: t3.nano
+    t3.micro:
+      InstanceType: t3.micro
+    t3.small:
+      InstanceType: t3.small
+    t3.medium:
+      InstanceType: t3.medium
+    t3.large:
+      InstanceType: t3.large
+    t3.xlarge:
+      InstanceType: t3.xlarge
+    t3.2xlarge:
+      InstanceType: t3.2xlarge
+    t3a.nano:
+      InstanceType: t3a.nano
+    t3a.micro:
+      InstanceType: t3a.micro
+    t3a.small:
+      InstanceType: t3a.small
+    t3a.medium:
+      InstanceType: t3a.medium
+    t3a.large:
+      InstanceType: t3a.large
+    t3a.xlarge:
+      InstanceType: t3a.xlarge
+    t3a.2xlarge:
+      InstanceType: t3a.2xlarge
+    t2.nano:
+      InstanceType: t2.nano
+    t2.micro:
+      InstanceType: t2.micro
+    t2.small:
+      InstanceType: t2.small
+    t2.medium:
+      InstanceType: t2.medium
+    t2.large:
+      InstanceType: t2.large
+    t2.xlarge:
+      InstanceType: t2.xlarge
+    t2.2xlarge:
+      InstanceType: t2.2xlarge
+    m5.large:
+      InstanceType: m5.large
+    m5.xlarge:
+      InstanceType: m5.xlarge
+    m5.2xlarge:
+      InstanceType: m5.2xlarge
+    m5.4xlarge:
+      InstanceType: m5.4xlarge
+    m5.8xlarge:
+      InstanceType: m5.8xlarge
+    m5.12xlarge:
+      InstanceType: m5.12xlarge
+    m5.16xlarge:
+      InstanceType: m5.16xlarge
+    m5.24xlarge:
+      InstanceType: m5.24xlarge
+    m5.metal:
+      InstanceType: m5.metal
+    m5d.large:
+      InstanceType: m5d.large
+    m5d.xlarge:
+      InstanceType: m5d.xlarge
+    m5d.2xlarge:
+      InstanceType: m5d.2xlarge
+    m5d.4xlarge:
+      InstanceType: m5d.4xlarge
+    m5d.8xlarge:
+      InstanceType: m5d.8xlarge
+    m5d.12xlarge:
+      InstanceType: m5d.12xlarge
+    m5d.16xlarge:
+      InstanceType: m5d.16xlarge
+    m5d.24xlarge:
+      InstanceType: m5d.24xlarge
+    m5d.metal:
+      InstanceType: m5d.metal
+    m5a.large:
+      InstanceType: m5a.large
+    m5a.xlarge:
+      InstanceType: m5a.xlarge
+    m5a.2xlarge:
+      InstanceType: m5a.2xlarge
+    m5a.4xlarge:
+      InstanceType: m5a.4xlarge
+    m5a.8xlarge:
+      InstanceType: m5a.8xlarge
+    m5a.12xlarge:
+      InstanceType: m5a.12xlarge
+    m5a.16xlarge:
+      InstanceType: m5a.16xlarge
+    m5a.24xlarge:
+      InstanceType: m5a.24xlarge
+    m5ad.large:
+      InstanceType: m5ad.large
+    m5ad.xlarge:
+      InstanceType: m5ad.xlarge
+    m5ad.2xlarge:
+      InstanceType: m5ad.2xlarge
+    m5ad.4xlarge:
+      InstanceType: m5ad.4xlarge
+    m5ad.8xlarge:
+      InstanceType: m5ad.8xlarge
+    m5ad.12xlarge:
+      InstanceType: m5ad.12xlarge
+    m5ad.16xlarge:
+      InstanceType: m5ad.16xlarge
+    m5ad.24xlarge:
+      InstanceType: m5ad.24xlarge
+    m5n.large:
+      InstanceType: m5n.large
+    m5n.xlarge:
+      InstanceType: m5n.xlarge
+    m5n.2xlarge:
+      InstanceType: m5n.2xlarge
+    m5n.4xlarge:
+      InstanceType: m5n.4xlarge
+    m5n.8xlarge:
+      InstanceType: m5n.8xlarge
+    m5n.12xlarge:
+      InstanceType: m5n.12xlarge
+    m5n.16xlarge:
+      InstanceType: m5n.16xlarge
+    m5n.24xlarge:
+      InstanceType: m5n.24xlarge
+    m5dn.large:
+      InstanceType: m5dn.large
+    m5dn.xlarge:
+      InstanceType: m5dn.xlarge
+    m5dn.2xlarge:
+      InstanceType: m5dn.2xlarge
+    m5dn.4xlarge:
+      InstanceType: m5dn.4xlarge
+    m5dn.8xlarge:
+      InstanceType: m5dn.8xlarge
+    m5dn.12xlarge:
+      InstanceType: m5dn.12xlarge
+    m5dn.16xlarge:
+      InstanceType: m5dn.16xlarge
+    m5dn.24xlarge:
+      InstanceType: m5dn.24xlarge
+    m5zn.large:
+      InstanceType: m5zn.large
+    m5zn.xlarge:
+      InstanceType: m5zn.xlarge
+    m5zn.2xlarge:
+      InstanceType: m5zn.2xlarge
+    m5zn.3xlarge:
+      InstanceType: m5zn.3xlarge
+    m5zn.6xlarge:
+      InstanceType: m5zn.6xlarge
+    m5zn.12xlarge:
+      InstanceType: m5zn.12xlarge
+    m5zn.metal:
+      InstanceType: m5zn.metal
+    m4.large:
+      InstanceType: m4.large
+    m4.xlarge:
+      InstanceType: m4.xlarge
+    m4.2xlarge:
+      InstanceType: m4.2xlarge
+    m4.4xlarge:
+      InstanceType: m4.4xlarge
+    m4.10xlarge:
+      InstanceType: m4.10xlarge
+    m4.16xlarge:
+      InstanceType: m4.16xlarge
+    c5.large:
+      InstanceType: c5.large
+    c5.xlarge:
+      InstanceType: c5.xlarge
+    c5.2xlarge:
+      InstanceType: c5.2xlarge
+    c5.4xlarge:
+      InstanceType: c5.4xlarge
+    c5.9xlarge:
+      InstanceType: c5.9xlarge
+    c5.12xlarge:
+      InstanceType: c5.12xlarge
+    c5.18xlarge:
+      InstanceType: c5.18xlarge
+    c5.24xlarge:
+      InstanceType: c5.24xlarge
+    c5.metal:
+      InstanceType: c5.metal
+    c5d.large:
+      InstanceType: c5d.large
+    c5d.xlarge:
+      InstanceType: c5d.xlarge
+    c5d.2xlarge:
+      InstanceType: c5d.2xlarge
+    c5d.4xlarge:
+      InstanceType: c5d.4xlarge
+    c5d.9xlarge:
+      InstanceType: c5d.9xlarge
+    c5d.12xlarge:
+      InstanceType: c5d.12xlarge
+    c5d.18xlarge:
+      InstanceType: c5d.18xlarge
+    c5d.24xlarge:
+      InstanceType: c5d.24xlarge
+    c5d.metal:
+      InstanceType: c5d.metal
+    c5a.large:
+      InstanceType: c5a.large
+    c5a.xlarge:
+      InstanceType: c5a.xlarge
+    c5a.2xlarge:
+      InstanceType: c5a.2xlarge
+    c5a.4xlarge:
+      InstanceType: c5a.4xlarge
+    c5a.8xlarge:
+      InstanceType: c5a.8xlarge
+    c5a.12xlarge:
+      InstanceType: c5a.12xlarge
+    c5a.16xlarge:
+      InstanceType: c5a.16xlarge
+    c5a.24xlarge:
+      InstanceType: c5a.24xlarge
+    c5ad.large:
+      InstanceType: c5ad.large
+    c5ad.xlarge:
+      InstanceType: c5ad.xlarge
+    c5ad.2xlarge:
+      InstanceType: c5ad.2xlarge
+    c5ad.4xlarge:
+      InstanceType: c5ad.4xlarge
+    c5ad.8xlarge:
+      InstanceType: c5ad.8xlarge
+    c5ad.12xlarge:
+      InstanceType: c5ad.12xlarge
+    c5ad.16xlarge:
+      InstanceType: c5ad.16xlarge
+    c5ad.24xlarge:
+      InstanceType: c5ad.24xlarge
+    c5n.large:
+      InstanceType: c5n.large
+    c5n.xlarge:
+      InstanceType: c5n.xlarge
+    c5n.2xlarge:
+      InstanceType: c5n.2xlarge
+    c5n.4xlarge:
+      InstanceType: c5n.4xlarge
+    c5n.9xlarge:
+      InstanceType: c5n.9xlarge
+    c5n.18xlarge:
+      InstanceType: c5n.18xlarge
+    c5n.metal:
+      InstanceType: c5n.metal
+    c4.large:
+      InstanceType: c4.large
+    c4.xlarge:
+      InstanceType: c4.xlarge
+    c4.2xlarge:
+      InstanceType: c4.2xlarge
+    c4.4xlarge:
+      InstanceType: c4.4xlarge
+    c4.8xlarge:
+      InstanceType: c4.8xlarge
   AWSRegionArch2AMI:
     # Ubuntu AMIs per region as of 2020-04-26 20:54:48 UTC
     # Data from: https://cloud-images.ubuntu.com/locator/ec2/releasesTable?_=1587934487
